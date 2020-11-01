@@ -1,19 +1,37 @@
 "use strict";
-const products = require("./mocked-data/products");
+const fs = require("fs");
+const util = require("util");
+const readFile = util.promisify(fs.readFile);
 
 module.exports.getProductById = async (event) => {
-  event = { path: "/2" };
+  let err;
+  let resultProduct;
+  let products;
 
-  const splittedPath = event.path.split("/");
-  const productId = Number(splittedPath[splittedPath.length - 1]);
-  const correspondingProductsArray = products.filter((item) => {
-    return item.id === productId;
-  });
+  try {
+    await readFile("./mocked-data/products.json", "utf8").then((data) => {
+      products = JSON.parse(data);
+    });
+  } catch {
+    err = "Something went wrong with products list";
+  }
+
+  try {
+    const { pathParameters } = event;
+    const productId = Number(pathParameters.productid);
+
+    const correspondingProductsArray = products.filter((item) => {
+      return item.id === productId;
+    });
+    resultProduct = correspondingProductsArray.length
+      ? JSON.stringify(correspondingProductsArray[0])
+      : "Item not found";
+  } catch {
+    err = "Something went wrong in search product by id process";
+  }
 
   return {
     statusCode: 200,
-    body: correspondingProductsArray.length
-      ? JSON.stringify(correspondingProductsArray[0])
-      : "Item not found",
+    body: err ? err : resultProduct,
   };
 };
