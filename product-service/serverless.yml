@@ -43,8 +43,12 @@ provider:
 #            - "/*"
 
 # you can define service wide environment variables here
-#  environment:
-#    variable1: value1
+  environment:
+    PG_HOST: task-4-instance.c1cw7q76jclg.eu-west-1.rds.amazonaws.com
+    PG_PORT: 5432
+    PG_DATABASE: task_4_db
+    PG_USERNAME: postgres
+    PG_PASSWORD: 
 
 # you can add packaging information here
 #package:
@@ -69,6 +73,13 @@ functions:
       - http:
           path: products/{productid}
           method: get
+          cors: true
+  fillInDB:
+    handler: ./fillindbhandler/fillindbhandler.fillInDB
+    events:
+      - http:
+          path: products/fillindb
+          method: post
           cors: true
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
