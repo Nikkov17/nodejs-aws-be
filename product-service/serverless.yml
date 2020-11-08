@@ -43,8 +43,12 @@ provider:
 #            - "/*"
 
 # you can define service wide environment variables here
-#  environment:
-#    variable1: value1
+  environment:
+    PG_HOST: task-4-instance.c1cw7q76jclg.eu-west-1.rds.amazonaws.com
+    PG_PORT: 5432
+    PG_DATABASE: task_4_db
+    PG_USERNAME: postgres
+    PG_PASSWORD: 
 
 # you can add packaging information here
 #package:
@@ -56,12 +60,33 @@ provider:
 #    - exclude-me-dir/**
 
 functions:
+  fillInDB:
+    handler: ./fillindbhandler/fillindbhandler.fillInDB
+    events:
+      - http:
+          path: products
+          method: put
+          cors: true
+  dropTables:
+    handler: ./droptableshandler/droptableshandler.dropTables
+    events:
+      - http:
+          path: products
+          method: delete
+          cors: true
   getProductsList:
     handler: ./productslisthandler/productslisthandler.getProductsList
     events:
       - http:
           path: products
           method: get
+          cors: true
+  createNewProduct:
+    handler: ./createnewproducthandler/createnewproducthandler.createNewProduct
+    events:
+      - http:
+          path: products
+          method: post
           cors: true
   getProductById:
     handler: ./productbyidhandler/productbyidhandler.getProductById
