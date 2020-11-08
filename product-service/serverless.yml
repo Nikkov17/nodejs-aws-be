@@ -60,6 +60,20 @@ provider:
 #    - exclude-me-dir/**
 
 functions:
+  fillInDB:
+    handler: ./fillindbhandler/fillindbhandler.fillInDB
+    events:
+      - http:
+          path: products
+          method: put
+          cors: true
+  dropTables:
+    handler: ./droptableshandler/droptableshandler.dropTables
+    events:
+      - http:
+          path: products
+          method: delete
+          cors: true
   getProductsList:
     handler: ./productslisthandler/productslisthandler.getProductsList
     events:
@@ -67,19 +81,19 @@ functions:
           path: products
           method: get
           cors: true
+  createNewProduct:
+    handler: ./createnewproducthandler/createnewproducthandler.createNewProduct
+    events:
+      - http:
+          path: products
+          method: post
+          cors: true
   getProductById:
     handler: ./productbyidhandler/productbyidhandler.getProductById
     events:
       - http:
           path: products/{productid}
           method: get
-          cors: true
-  fillInDB:
-    handler: ./fillindbhandler/fillindbhandler.fillInDB
-    events:
-      - http:
-          path: products/fillindb
-          method: post
           cors: true
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events

@@ -18,21 +18,24 @@ module.exports.fillInDB = async () => {
   const client = new Client(dbOptions);
   await client.connect();
 
+  await client.query(` CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`);
+
   try {
     const ddlResult = await client.query(`
       create table if not exists products (
-          id serial primary key,
+          id uuid DEFAULT uuid_generate_v4 (),
           title text,
           description text,
-          price integer
+          price integer,
+          PRIMARY KEY (id)
       )`);
-    const ddlResult2 = await client.query(`  
+    const ddlResult2 = await client.query(` 
       create table if not exists stocks (
-          id serial primary key,
-          product_id integer,
+          product_id uuid,
           count integer,
           foreign key ("product_id") references "products" ("id")
       )`);
+    console.log(ddlResult, ddlResult2);
 
     const dmlResult = await client.query(`
         insert into products (title, description, price) values
@@ -40,8 +43,9 @@ module.exports.fillInDB = async () => {
             ('ferari', 'fast as lightning', 3000000)`);
     const dmlResult2 = await client.query(`
         insert into stocks (product_id, count) values
-            (1, 20),
-            (2, 3);`);
+            ((SELECT id from products WHERE title='ford' AND description='strong and reliable car' AND price=12000), 20),
+            ((SELECT id from products WHERE title='ferari' AND description='fast as lightning' AND price=3000000), 3)`);
+    console.log(dmlResult, dmlResult2);
   } catch (error) {
     err = `Error during database tables operations:${error}`;
   } finally {

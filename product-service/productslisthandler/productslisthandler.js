@@ -24,6 +24,7 @@ module.exports.getProductsList = async () => {
       `select products.*, stocks.count from products left join stocks on products.id=stocks.product_id;`
     );
     products = productsRows;
+    console.log(products);
   } catch (error) {
     err = `Something went wrong with products list reading: ${error}`;
   } finally {
