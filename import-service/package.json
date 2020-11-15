@@ -12,7 +12,9 @@
     ]
   },
   "devDependencies": {
-    "aws-sdk": "^2.792.0",
+    "aws-sdk": "^2.792.0"
+  },
+  "dependencies": {
     "csv-parser": "^2.3.3"
   }
 }
