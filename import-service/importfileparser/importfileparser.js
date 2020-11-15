@@ -44,6 +44,19 @@ module.exports.importFileParser = async (event) => {
     }
   } catch (err) {
     console.error(err);
-    return;
+    return {
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+      },
+      statusCode: 500,
+      body: JSON.stringify({ error: err.message }),
+    };
   }
+
+  return {
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+    },
+    statusCode: 200,
+  };
 };
