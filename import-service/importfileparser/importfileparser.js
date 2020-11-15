@@ -26,21 +26,34 @@ module.exports.importFileParser = async (event) => {
     const { Records } = event;
 
     for (const record of Records) {
-      await processRecord(record.s3.object.key, s3);
+      const key = record.s3.object.key;
+      const params = {
+        Bucket: BUCKET,
+        key,
+      };
 
-      const Key = record.s3.object.key.replace("uploaded", "parsed");
+      const s3Stream = s3.getObject(params).createReadStream();
 
-      await s3
-        .copyObject({
-          Bucket: BUCKET,
-          Key,
-          CopySource: `${BUCKET}/${record.s3.object.key}`,
+      s3Stream
+        .pipe(csv())
+        .on("data", (data) => {
+          console.log(JSON.stringify(data, null, 4));
         })
-        .promise();
+        .on("end", async () => {
+          const Key = record.s3.object.key.replace("uploaded", "parsed");
 
-      await s3
-        .deleteObject({ Bucket: BUCKET, Key: record.s3.object.key })
-        .promise();
+          await s3
+            .copyObject({
+              Bucket: BUCKET,
+              Key,
+              CopySource: `${BUCKET}/${record.s3.object.key}`,
+            })
+            .promise();
+
+          await s3
+            .deleteObject({ Bucket: BUCKET, Key: record.s3.object.key })
+            .promise();
+        });
     }
   } catch (err) {
     console.error(err);
