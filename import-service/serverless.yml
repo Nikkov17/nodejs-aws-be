@@ -31,16 +31,11 @@ provider:
    - Effect: "Allow"
      Action:
        - "s3:ListBucket"
-     Resource: { "Fn::Join" : ["", ["arn:aws:s3:::", { "Ref" : "ServerlessDeploymentBucket" } ] ]  }
+     Resource: "arn:aws:s3:::rs-task-5-uploaded"
    - Effect: "Allow"
      Action:
        - "s3:*"
-     Resource:
-       Fn::Join:
-         - ""
-         - - "arn:aws:s3:::"
-           - "Ref" : "ServerlessDeploymentBucket"
-           - "/*"
+     Resource: "arn:aws:s3:::rs-task-5-uploaded/*"
 
 # you can define service wide environment variables here
   # environment:
