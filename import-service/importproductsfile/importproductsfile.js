@@ -3,6 +3,7 @@ const { S3 } = require("aws-sdk");
 const { BUCKET, REGION } = require("../constants");
 
 module.exports.importProductsFile = async (event) => {
+  console.log("BUCKET:" + BUCKET);
   try {
     const { name } = event.queryStringParameters;
     const path = `uploaded/${name}`;
