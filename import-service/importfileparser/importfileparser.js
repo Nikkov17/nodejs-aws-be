@@ -1,7 +1,7 @@
 "use strict";
 import { S3 } from "aws-sdk";
 
-module.exports.importFileParser = r = async (event) => {
+module.exports.importFileParser = async (event) => {
   try {
     const { name } = event.queryStringParameters;
     const path = `uploaded/${name}`;
