@@ -1,6 +1,6 @@
 const { PG_HOST, PG_PORT, PG_DATABASE, PG_USERNAME, PG_PASSWORD } = process.env;
 
-module.exports.constants = {
+module.exports = {
   DBOPTIONS: {
     host: PG_HOST,
     port: PG_PORT,
