@@ -1,5 +1,5 @@
 "use strict";
-import { S3 } from "aws-sdk";
+const { S3 } = require("aws-sdk");
 
 module.exports.importProductsFile = async (event) => {
   try {
