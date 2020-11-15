@@ -1,15 +1,16 @@
 "use strict";
 const { S3 } = require("aws-sdk");
+const { BUCKET, REGION } = require("../constants");
 
 module.exports.importProductsFile = async (event) => {
   try {
     const { name } = event.queryStringParameters;
     const path = `uploaded/${name}`;
 
-    const s3 = new S3({ region: "eu-west-1" });
+    const s3 = new S3({ region: REGION });
 
     const params = {
-      Bucket: "rs-task-5-uploaded",
+      Bucket: BUCKET,
       Key: path,
       Expires: 60,
       ContentType: "text/csv",
