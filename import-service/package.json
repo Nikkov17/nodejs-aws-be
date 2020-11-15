@@ -1,0 +1,18 @@
+{
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "aws-sdk": "^2.792.0",
+    "csv-parser": "^2.3.3"
+  }
+}
