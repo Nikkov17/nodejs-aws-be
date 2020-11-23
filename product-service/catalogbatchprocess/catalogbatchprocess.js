@@ -1,0 +1,24 @@
+"use strict";
+const { SNS } = require("aws-sdk");
+
+module.exports.catalogBatchProcess = (event) => {
+  const products = event.Records.map((record) => record.body);
+  console.log(`products: ${products}`);
+
+  const sns = new SNS({ region: "eu-west-1" });
+
+  sns.publish(
+    {
+      Subject: "Product created",
+      Message: `Your products has been created: ${products}`,
+      TopicArn: process.env.SNS_ARN,
+    },
+    (error) => {
+      if (error) {
+        console.log(`error: ${error.message}`);
+      } else {
+        console.log(`Send email about products creation: ${products}`);
+      }
+    }
+  );
+};
