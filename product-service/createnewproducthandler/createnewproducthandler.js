@@ -4,43 +4,59 @@ const { DBOPTIONS } = require("../constants");
 const dbOptions = DBOPTIONS;
 
 module.exports.createNewProduct = async (event) => {
+  console.log(`event: ${event}`);
+
   const client = new Client(dbOptions);
   await client.connect();
-  const body = JSON.parse(event.body);
-  const { title, description, price, count } = body;
+
+  let body;
+
+  if (event.body) {
+    body = JSON.parse(event.body);
+  } else {
+    body = JSON.parse(event.Records[0].body);
+  }
+
+  console.log(`body: ${JSON.stringify(body)}`);
+
+  let { title, description, price, count } = body;
   let err;
   let statusCode = 200;
+  price = Number(price);
+  count = Number(count);
 
   try {
     if (typeof title !== "string") {
       throw new TypeError("wrong data type: title");
     } else if (typeof description !== "string") {
       throw new TypeError("wrong data type: description");
-    } else if (typeof price !== "number") {
+    } else if (!price) {
       throw new TypeError("wrong data type: price");
-    } else if (typeof count !== "number") {
+    } else if (!count) {
       throw new TypeError("wrong data type: count");
     }
 
-    const dmlResult = await client.query(
+    await client.query(
       `
         insert into products (title, description, price) values
             ($1, $2, $3)`,
       [title, description, price]
     );
-    const dmlResult2 = await client.query(
+    await client.query(
       `
         insert into stocks (product_id, count) values
             ((SELECT id from products WHERE title=$1 AND description=$2 AND price=$3),  $4)`,
       [title, description, price, count]
     );
-    console.log(dmlResult, dmlResult2);
+    console.log(
+      `Product added to db: ${title} ${description} ${price} ${count}`
+    );
   } catch (error) {
     statusCode = error.name === "TypeError" ? 400 : 500;
     err = `Something went wrong in new product create process: ${error}`;
-  } finally {
-    client.end();
   }
+
+  client.end();
 
   return {
     statusCode: statusCode,

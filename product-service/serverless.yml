@@ -27,20 +27,17 @@ provider:
   region: eu-west-1
 
 # you can add statements to the Lambda function's IAM Role here
-#  iamRoleStatements:
-#    - Effect: "Allow"
-#      Action:
-#        - "s3:ListBucket"
-#      Resource: { "Fn::Join" : ["", ["arn:aws:s3:::", { "Ref" : "ServerlessDeploymentBucket" } ] ]  }
-#    - Effect: "Allow"
-#      Action:
-#        - "s3:PutObject"
-#      Resource:
-#        Fn::Join:
-#          - ""
-#          - - "arn:aws:s3:::"
-#            - "Ref" : "ServerlessDeploymentBucket"
-#            - "/*"
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - "sqs:*"
+      Resource:
+        - Fn::GetAtt: [SQSQueue, Arn]
+    - Effect: "Allow"
+      Action:
+        - "sns:*"
+      Resource:
+        Ref: SNSTopic
 
 # you can define service wide environment variables here
   environment:
@@ -49,6 +46,10 @@ provider:
     PG_DATABASE: task_4_db
     PG_USERNAME: postgres
     PG_PASSWORD: FGbbZKpnE8UVmXfJ4oCn
+    SQS_URL:
+      Ref: SQSQueue
+    SNS_ARN:
+      Ref: SNSTopic
 
 # you can add packaging information here
 #package:
@@ -58,6 +59,33 @@ provider:
 #  exclude:
 #    - exclude-me.js
 #    - exclude-me-dir/**
+
+resources:
+  Resources:
+    SQSQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: catalogItemsQueue
+    SNSTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        TopicName: createProductTopic
+    SNSSubscription1:
+      Type: AWS::SNS::Subscription
+      Properties:
+        Endpoint: hesaye1972@natxt.com
+        Protocol: email
+        TopicArn:
+          Ref: SNSTopic
+        FilterPolicy:
+          title: [{"prefix": "a"}]
+    SNSSubscription2:
+      Type: AWS::SNS::Subscription
+      Properties:
+        Endpoint: cikasah435@natxt.com
+        Protocol: email
+        TopicArn:
+          Ref: SNSTopic
 
 functions:
   fillInDB:
@@ -88,6 +116,12 @@ functions:
           path: products
           method: post
           cors: true
+      - sqs:
+          batchSize: 5
+          arn:
+            Fn::GetAtt:
+              - SQSQueue
+              - Arn
   getProductById:
     handler: ./productbyidhandler/productbyidhandler.getProductById
     events:
@@ -95,6 +129,15 @@ functions:
           path: products/{productid}
           method: get
           cors: true
+  catalogBatchProcess:
+    handler: ./catalogbatchprocess/catalogbatchprocess.catalogBatchProcess
+    events:
+      - sqs:
+          batchSize: 5
+          arn:
+            Fn::GetAtt:
+              - SQSQueue
+              - Arn
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
 #    Check the event documentation for details

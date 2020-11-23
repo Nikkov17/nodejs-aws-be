@@ -36,6 +36,10 @@ provider:
       Action:
         - "s3:*"
       Resource: "arn:aws:s3:::rs-task-5-uploaded/*"
+    - Effect: "Allow"
+      Action:
+        - "sqs:*"
+      Resource: "arn:aws:sqs:eu-west-1:381077858456:catalogItemsQueue"
 
 # you can define service wide environment variables here
   # environment:
