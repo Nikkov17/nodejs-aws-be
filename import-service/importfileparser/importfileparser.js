@@ -21,22 +21,29 @@ module.exports.importFileParser = (event) => {
       s3Stream
         .pipe(csv())
         .on("data", (data) => {
-          console.log(JSON.stringify(data, null, 4));
+          const csvString = JSON.stringify(data);
+          console.log(`csvString: ${csvString}`);
 
-          const productsString = JSON.stringify(data, null, 4);
-          console.log(`productsString: ${productsString}`);
-
-          const products = JSON.parse(productsString);
-          console.log(`products: ${products}`);
+          let products = JSON.parse(csvString);
+          if (!Array.isArray(products)) {
+            products = [products];
+          }
 
           products.forEach((product) => {
             sqs.sendMessage(
               {
-                QueueUrl: process.env.SQS_URL,
-                MessageBody: product,
+                QueueUrl:
+                  "https://sqs.eu-west-1.amazonaws.com/381077858456/catalogItemsQueue",
+                MessageBody: JSON.stringify(product),
               },
-              () => {
-                console.log(`Send product to queue: ${product}`);
+              (error, product) => {
+                if (error) {
+                  console.log(`error: ${error.message}`);
+                } else {
+                  console.log(
+                    `Send product to queue: ${JSON.stringify(product)}`
+                  );
+                }
               }
             );
           });

@@ -26,10 +26,6 @@ provider:
   stage: dev
   region: eu-west-1
 
-  environment:
-    SQS_URL:
-      Ref: SQSQueue
-
 # you can add statements to the Lambda function's IAM Role here
   iamRoleStatements:
     - Effect: "Allow"
@@ -40,6 +36,10 @@ provider:
       Action:
         - "s3:*"
       Resource: "arn:aws:s3:::rs-task-5-uploaded/*"
+    - Effect: "Allow"
+      Action:
+        - "sqs:*"
+      Resource: "arn:aws:sqs:eu-west-1:381077858456:catalogItemsQueue"
 
 # you can define service wide environment variables here
   # environment:
@@ -51,13 +51,6 @@ provider:
 #  exclude:
 #    - exclude-me.js
 #    - exclude-me-dir/**
-
-resources:
-  Resources:
-    SQSQueue:
-      Type: AWS::SQS::Queue
-      Properties:
-        QueueName: catalogItemsQueue
 
 functions:
   importProductsFile:
@@ -81,15 +74,6 @@ functions:
             - prefix: uploaded/
             - suffix: .csv 
           existing: true
-  catalogBatchProcess:
-    handler: ./catalogbatchprocess/catalogbatchprocess.catalogBatchProcess
-    events:
-      - sqs:
-          batchSize: 5
-          arn:
-            Fn::GetAtt:
-              - SQSQueue
-              - Arn
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
 #    Check the event documentation for details
