@@ -70,10 +70,19 @@ resources:
       Type: AWS::SNS::Topic
       Properties:
         TopicName: createProductTopic
-    SNSSubscription:
+    SNSSubscription1:
       Type: AWS::SNS::Subscription
       Properties:
-        Endpoint: kovalyov.k51@gmail.com
+        Endpoint: hesaye1972@natxt.com
+        Protocol: email
+        TopicArn:
+          Ref: SNSTopic
+        FilterPolicy:
+          title: [{"prefix": "a"}]
+    SNSSubscription2:
+      Type: AWS::SNS::Subscription
+      Properties:
+        Endpoint: cikasah435@natxt.com
         Protocol: email
         TopicArn:
           Ref: SNSTopic
