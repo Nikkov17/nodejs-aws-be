@@ -10,7 +10,7 @@ module.exports.catalogBatchProcess = async (event) => {
   await sns
     .publish(
       {
-        Subject: "Product created",
+        Subject: "Products created",
         Message: `Your products has been created: ${products}`,
         TopicArn: process.env.SNS_ARN,
       },
