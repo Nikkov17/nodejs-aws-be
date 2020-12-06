@@ -12,6 +12,14 @@ module.exports.basicAuthorizer = async (event, context, cb) => {
   try {
     const authorizationToken = event.authorizationToken;
 
+    if (!authorizationToken) cb("Unauthorized");
+    if (
+      authorizationToken.split(" ")[0] !== "Basic" ||
+      !authorizationToken.split(" ")[1]
+    ) {
+      cb("Unauthorized");
+    }
+
     const encodedCreds = authorizationToken.split(" ")[1];
     const buff = Buffer.from(encodedCreds, "base64");
     const plainCreds = buff.toString("utf-8").split(":");
